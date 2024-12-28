@@ -1,0 +1,8 @@
+pydantic
+pydantic_extra_types
+rich
+requests
+paho-mqtt
+caterpillar@git+https://github.com/MatrixEditor/caterpillar.git
+pyserial
+cryptography

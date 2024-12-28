@@ -1,0 +1,18 @@
+[project]
+name = "meross-scripts"
+version = "0.0.1"
+description=""
+authors = [
+
+]
+readme = "README.md"
+classifiers = [
+    'Programming Language :: Python :: 3.13',
+  ]
+
+[project.scripts]
+mrs = "libmeross.cli:cli_entry"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["libmeross*"]
