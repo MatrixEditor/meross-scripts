@@ -20,7 +20,7 @@ from libmeross.ambz2.layout import (
 def test_build_boot_record() -> PartitionTableRecord:
     boot_record: PartitionTableRecord = PartitionTableRecord(
         start=0x4000,
-        length=0x8000,
+        length=0xC000,
         type=PartitionType.BOOT,
     )
     assert boot_record.hash_key == FF_32
@@ -31,12 +31,12 @@ def test_build_boot_record() -> PartitionTableRecord:
 def test_build_firmware_records() -> list[PartitionTableRecord]:
     fw1_record: PartitionTableRecord = PartitionTableRecord(
         start=0x10000,
-        length=0x100000,
+        length=0x000B0780,
         type=PartitionType.FW1,  # unused partition
     )
     fw2_record: PartitionTableRecord = PartitionTableRecord(
         start=0x110000,
-        length=0x100000,
+        length=0x9c800,
         type=PartitionType.FW2,
     )
     return [fw1_record, fw2_record]
@@ -59,8 +59,8 @@ def test_build_pt_info() -> PartitionTableInfo:
     pt_info: PartitionTableInfo = PartitionTableInfo(
         eFWV=0x00,
         num=2,  # number excluding boot entry
-        fw1_idx=0,
-        fw2_idx=1,
+        fw1_idx=1,
+        fw2_idx=2,
         user_len=0x00,
         boot_record=test_build_boot_record(),
         records=test_build_firmware_records(),

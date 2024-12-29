@@ -177,20 +177,6 @@ class PartitionTableRecord:
     hash_key: Bytes(32) = FF_32
 
 
-class FixedSize(Transformer):
-    def __init__(self, length, s) -> None:
-        super().__init__(Bytes(length))
-        self.s = s
-
-    def decode(self, parsed: bytes, context):
-        return unpack(self.s, parsed)
-
-    def encode(self, obj, context):
-        data = pack(obj, self.s)
-        target = self.__size__(context)
-        return data + b"\x00" * (target - len(data))
-
-
 # Even though the document specifies some regions within the partition
 # table info as "reserved". However, these reserved regions are used
 # within the generation process.
