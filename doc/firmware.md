@@ -127,13 +127,6 @@ If you enter download mode, following the guide by [ltchiptool](https://github.c
 you’ll gain access to additional commands. These commands provide various functionalities for
 interacting with the device. Here’s a list of the commands identified so far:
 
-
-#### Download Mode CLI
-
-Yes, there are *more* commands if you enter the download mode using the guide
-by [ltchiptool](https://github.com/libretiny-eu/ltchiptool). The following have
-been identified so far:
-
 ```
 ping
     Ping back
