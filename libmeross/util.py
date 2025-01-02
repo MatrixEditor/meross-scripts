@@ -20,7 +20,7 @@ def hash_password(password: str) -> str:
 
 
 def get_timestamp() -> int:
-    return int(datetime.datetime.now().timestamp() / 1000)
+    return int(datetime.datetime.now().timestamp())
 
 
 class _ColoredFormatter(logging.Formatter):
@@ -46,6 +46,3 @@ def setup_logging(level: str) -> None:
     handler.highlighter = None  # pyright: ignore[reportAttributeAccessIssue]
     logger.setLevel(level)
     logging.basicConfig(handlers=[handler])
-
-
-

@@ -1,5 +1,7 @@
 import json
 import base64
+import string
+import uuid
 
 from pydantic import Base64Str, BaseModel, PositiveInt, Field
 from typing import Any, TypeVar
@@ -16,11 +18,11 @@ class Header(BaseModel):
     sign: str
     method: str
     namespace: str
-    protocolVersion: PositiveInt = 1
-    payloadVersion: PositiveInt = 1
-    triggerSrc: str = ""
-    uuid: str = ""
-    from_: str = Field(serialization_alias="from", default="")
+    # protocolVersion: PositiveInt = 1
+    # payloadVersion: PositiveInt = 2
+    # triggerSrc: str = ""
+    # uuid: str = ""
+    from_: str = Field(serialization_alias="from", default="Cloud")
 
 
 class LocalMessage(BaseModel):
@@ -44,7 +46,7 @@ class LocalMessage(BaseModel):
         payload: BaseModel | dict | None = None,
         shared_key: str | None = None,
     ) -> "LocalMessage":
-        message_id = util.generate_random(16)
+        message_id = util.generate_random(32, string.digits + "abcdef")
         sign, timestamp = cls.signature(message_id, shared_key=shared_key)
 
         if isinstance(payload, BaseModel):

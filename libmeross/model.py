@@ -1,4 +1,3 @@
-from re import sub
 from pydantic import BaseModel, PositiveInt, Base64Str
 from pydantic_core import Url
 from pydantic_extra_types.mac_address import MacAddress
@@ -7,11 +6,11 @@ from pydantic_extra_types.mac_address import MacAddress
 class Firmware(BaseModel):
     version: str
     compileTime: str
-    wifiMac: MacAddress
+    wifiMac: str
     innerIp: str
     server: str
-    port: PositiveInt
-    userId: PositiveInt
+    port: int
+    userId: int
 
 
 class Hardware(BaseModel):

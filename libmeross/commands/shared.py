@@ -38,7 +38,10 @@ def send_message(
 
     try:
         response = requests.post(
-            url, json=message.model_dump(), timeout=timeout, headers=headers
+            url,
+            json=message.model_dump(by_alias=True),
+            timeout=timeout,
+            headers=headers,
         )
         logger.debug(f"Message IN: {response.text}")
     except requests.exceptions.ConnectTimeout:
