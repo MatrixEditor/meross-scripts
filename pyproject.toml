@@ -1,14 +1,20 @@
 [project]
 name = "meross-scripts"
 version = "0.0.1"
-description=""
-authors = [
-
-]
+description = ""
+authors = []
 readme = "README.md"
-classifiers = [
-    'Programming Language :: Python :: 3.13',
-  ]
+classifiers = ['Programming Language :: Python :: 3.13']
+dependencies = [
+  "rich",
+  "caterpillar-py",
+  "pyserial",
+  "cryptography",
+  "requests",
+  "pydantic",
+  "pydantic_extra_types",
+  "paho-mqtt",
+]
 
 [project.scripts]
 mrs = "libmeross.cli:cli_entry"
