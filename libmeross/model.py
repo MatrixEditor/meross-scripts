@@ -120,3 +120,28 @@ class FirmwareUpdateConfig(BaseModel):
 
     firmwares: FirmwareConfig
     deviceTypes: list[DeviceTypeByUUID] = []
+
+
+class UserInfoResponse(BaseModel):
+    avatar: str = ""
+    birthday: str = ""
+    dealSite: str = ""
+    follower: int = -1
+    following: int = -1
+    forumSite: str = ""
+    goldCoin: int = -1
+    guid: str = ""
+    guidGrayId: str = ""
+    isBindAlexa: int = -1
+    isBindGoogle: int = -1
+    isBindSmartThings: int = -1
+    level: int = -1
+    mfaSwitch: int = -1
+    mobile: str = ""
+    nickname: str = ""
+    posts: int = -1
+    region: str = ""
+
+class UserInfoRequest(BaseModel):
+    timezone: str
+    regionCode: str

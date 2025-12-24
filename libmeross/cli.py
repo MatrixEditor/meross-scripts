@@ -40,11 +40,11 @@ def cli_entry():
         return
 
     if argv.debug:
-        setup_logging("DEBUG")
+        setup_logging("NOTSET")
     elif argv.verbose:
-        setup_logging("INFO")
+        setup_logging("DEBUG")
     else:
-        setup_logging("WARNING")
+        setup_logging("INFO")
 
     logger.debug(f"Running command {argv.func.__module__}")
     try:

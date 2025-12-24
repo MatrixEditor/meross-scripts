@@ -85,7 +85,7 @@ def cli(argv: argparse.Namespace) -> None:
         table.add_column("Device Uuid", justify="left", style="bold", overflow="fold")
         table.add_column("Type-SubType", justify="left", style="bold")
         table.add_column("Version", justify="left")
-        table.add_column("Url", justify="left")
+        table.add_column("Url", justify="left", overflow="fold")
         table.add_column("MD5", justify="left")
         for fmware in firmwares.commonFirmwares:
             table.add_row(

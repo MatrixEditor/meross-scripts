@@ -69,7 +69,7 @@ extra kind of verification (as of end 2024). Thus, a simple APi request
 registers a functionable account:
 
 ```bash
-$ mrs cloud signup --host 'iot.meross.com' -U 'email' -p '' -use-encryption
+$ mrs cloud auth signup --host 'iot.meross.com' -U 'email' -p '' --use-encryption
 ```
 
 > [!TIP]
@@ -84,7 +84,7 @@ Login is as easy as signup - using the stored credentials only
 the command itself must be typed.
 
 ```bash
-$ mrs cloud login --host $SERVER
+$ mrs cloud auth login --host $SERVER
 ```
 
 #### Logout
@@ -92,7 +92,7 @@ $ mrs cloud login --host $SERVER
 To invalidate an authentication token use the `logout` command:
 
 ```bash
-$ mrs cloud logout --host $SERVER
+$ mrs cloud auth logout --host $SERVER
 ```
 
 

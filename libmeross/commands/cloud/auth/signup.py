@@ -1,4 +1,6 @@
 import argparse
+import logging
+import uuid
 
 from pydantic import BaseModel, ValidationError
 from rich import console
@@ -22,7 +24,7 @@ from .login import ResultLogin
 def install_parser(subparsers: argparse._SubParsersAction) -> None:
     parser = subparsers.add_parser(
         "signup",
-        help="Sign up for Meross Cloud",
+        help="Sign up to Meross Cloud",
         usage=parser_get_usage(__name__),
         description="Sign up tool for your Meross Cloud account",
         formatter_class=argparse.MetavarTypeHelpFormatter,
@@ -30,7 +32,7 @@ def install_parser(subparsers: argparse._SubParsersAction) -> None:
     parser_add_user_agent(parser)
     parser_add_extra_header(parser)
     parser_add_timeout(parser)
-    parser_add_host(parser)
+    parser_add_host(parser, settings.cloud.domain or "iot.meross.com")
 
     account_group = parser.add_argument_group("Account-Options")
     account_group.add_argument(
@@ -47,6 +49,19 @@ def install_parser(subparsers: argparse._SubParsersAction) -> None:
         help="The password to sign up with (default is from config)",
         default=None,
     )
+    account_group.add_argument(
+        "-V",
+        "--vendor",
+        type=str,
+        help="The vendor to use within the registration data (default: meross)",
+        default="meross",
+    )
+    account_group.add_argument(
+        "--country",
+        type=str,
+        help="The country code to assign (default: cn)",
+        default=settings.account.region or "cn",
+    )
 
     utility_group = parser.add_argument_group("Utility-Options")
     utility_group.add_argument(
@@ -61,19 +76,66 @@ def install_parser(subparsers: argparse._SubParsersAction) -> None:
         help="The path to the signup endpoint (defaults to: '/v1/Auth/signUp')",
     )
 
+    group = parser.add_argument_group("Additional Options")
+    group.add_argument(
+        "--mobile-resolution",
+        type=str,
+        default="2880*1440",
+        help="Resolution of the mobile device",
+    )
+    group.add_argument(
+        "--mobile-model",
+        type=str,
+        default="Pixel 3",
+        help="Mobile device model",
+    )
+    group.add_argument(
+        "--mobile-os",
+        type=str,
+        default="Android",
+        help="Mobile device operating system)",
+    )
+    group.add_argument(
+        "--mobile-os-version",
+        type=str,
+        default="16",
+        help="Mobile device operating system version number",
+    )
+    group.add_argument(
+        "--mobile-uuid",
+        type=str,
+        default=str(uuid.uuid4()),
+        help="Mobile device uuid (always random)",
+    )
+
     parser.set_defaults(func=cli)
 
 
 # --- model --
+class MobileInfo(BaseModel):
+    resolution: str = "1*1"
+    carrier: str = ""
+    deviceModel: str = "Android,Android"
+    mobileOs: str = "Android"
+    mobileOsVersion: str = "16"
+    uuid: str = str(uuid.uuid4())
+
+
 class SignUpData(BaseModel):
-    username: str
+    email: str
     password: str
     encryption: int
+    vendor: str = "meross"
+    accountCountryCode: str = "cn"
+    mobileInfo: MobileInfo = MobileInfo()
 
 
 def cli(argv: argparse.Namespace) -> None:
     if argv.signup_path[0] != "/":
         argv.signup_path = f"/{argv.signup_path}"
+
+    if argv.host is None:
+        return logger.error("No host specified!")
 
     url = f"https://{argv.host}{argv.signup_path}"
     logger.debug(f"Backend URL: {url}")
@@ -84,7 +146,7 @@ def cli(argv: argparse.Namespace) -> None:
     # REVISIT: duplicate code
     if not argv.password:
         if not settings.account.password:
-            logger.warn("Password not set but required is required")
+            logger.warning("Password not set but required is required")
             input_console = console.Console()
             argv.password = input_console.input(
                 "[bold yellow]> : Password: [/]", password=True
@@ -109,9 +171,18 @@ def cli(argv: argparse.Namespace) -> None:
             argv.password = hash_password(argv.password)
 
     payload = SignUpData(
-        username=argv.username,
+        email=argv.username,
         password=argv.password,
         encryption=1 if argv.use_encryption else 0,
+        accountCountryCode=argv.country,
+        vendor=argv.vendor,
+        mobileInfo=MobileInfo(
+            resolution=argv.mobole_resolution,
+            mobileOs=argv.mobile_os,
+            mobileOsVersion=argv.mobile_os_version,
+            uuid=argv.mobile_uuid,
+            deviceModel=f"Android,{argv.mobile_model}",
+        ),
     )
 
     headers = get_additional_headers(argv)
@@ -123,14 +194,12 @@ def cli(argv: argparse.Namespace) -> None:
         return
 
     if response.apiStatus != 0:
-        logger.error(f"Failed to sign up: {response}")
-        return
+        return logger.error(f"Failed to sign up: {response}")
 
     try:
         data = ResultLogin.model_validate(response.data)
     except ValidationError as e:
-        logger.error(f"Failed to sign up: {e}")
-        return
+        return logger.error(f"Failed to sign up: {e}")
 
     logger.info("Registration successful:")
     logger.info("=" * 50)

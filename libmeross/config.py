@@ -18,6 +18,7 @@ class AccountConfig(BaseModel):
     userId: str = ""
     key: str = ""
     passwordEncrypted: bool = False
+    region: str = "cn"
 
 
 class DeviceConfig(BaseModel):
