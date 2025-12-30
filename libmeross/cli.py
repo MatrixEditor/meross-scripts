@@ -39,9 +39,7 @@ def cli_entry():
         parser.print_help()
         return
 
-    if argv.debug:
-        setup_logging("NOTSET")
-    elif argv.verbose:
+    if argv.debug or argv.verbose:
         setup_logging("DEBUG")
     else:
         setup_logging("INFO")

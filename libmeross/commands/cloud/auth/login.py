@@ -47,6 +47,12 @@ def install_parser(subparsers: argparse._SubParsersAction) -> None:
         default=None,
     )
     account_group.add_argument(
+        "--hash",
+        type=str,
+        help="The md5 hash of the password.",
+        default=None,
+    )
+    account_group.add_argument(
         "--mfa-code",
         type=str,
         help="The MFA code to use",
@@ -89,6 +95,10 @@ def cli(argv: argparse.Namespace) -> None:
         logger.error("Username is required")
         return
 
+    if argv.hash:
+        argv.password = argv.hash
+        argv.use_encryption = True
+
     if not argv.password:
         if not settings.account.password:
             logger.warn("Password not set but required is required")
@@ -111,7 +121,7 @@ def cli(argv: argparse.Namespace) -> None:
                 argv.password = hash_password(settings.account.password)
 
     else:
-        if argv.use_encryption:
+        if argv.use_encryption and not argv.hash:
             argv.password = hash_password(argv.password)
 
     payload = RequestLogin(
@@ -148,5 +158,7 @@ def cli(argv: argparse.Namespace) -> None:
 
     settings.account.token = data.token
     settings.account.key = data.key
+    settings.account.email = data.email
+    settings.account.userId = data.userid
     settings.cloud.domain = data.domain.removeprefix("https://")
     settings.cloud.mqttDomain = data.mqttDomain

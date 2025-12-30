@@ -1,11 +1,11 @@
 import argparse
+import json
 import ssl
 
 import paho.mqtt.client as mqtt
 from pydantic import ValidationError
 from pydantic_extra_types.mac_address import MacAddress
 
-from libmeross.commands import device
 from libmeross.commands.shared import (
     get_additional_headers,
     parser_add_extra_header,
@@ -31,7 +31,7 @@ def install_parser(subparsers: argparse._SubParsersAction) -> None:
         help="Add a device to Meross Cloud",
         usage=parser_get_usage(__name__),
         description="Device binding tool (Cloud)",
-        formatter_class=argparse.MetavarTypeHelpFormatter,
+        # formatter_class=argparse.MetavarTypeHelpFormatter,
     )
     parser_add_user_agent(parser)
     parser_add_extra_header(parser)
@@ -73,6 +73,12 @@ def install_parser(subparsers: argparse._SubParsersAction) -> None:
         help="The IP address of the device to bind",
         default=settings.device.deviceIp,
     )
+    device_options.add_argument(
+        "--local-config",
+        type=argparse.FileType("rb"),
+        help="Path to the local JSON file storing the device firmware and hardware config",
+        default=None,
+    )
     parser.add_argument(
         "--no-privacy",
         action="store_true",
@@ -89,7 +95,7 @@ def _send_local_message(url, path, target, key, item):
         return None
 
     if not response.verify(key):
-        logger.warn("Could not verify local response - message could be tampered with")
+        logger.warning("Could not verify local response - message could be tampered with")
 
     try:
         return target.model_validate(response.payload[item])
@@ -101,14 +107,23 @@ def _send_local_message(url, path, target, key, item):
 def cli(argv):
     require_info_level(argv)
 
-    if not argv.device_ip:
-        logger.error("Missing device IP")
+    if not argv.device_ip and not argv.local_config:
+        logger.error("Missing device IP or local config")
         return
 
-    device_url = f"http://{argv.device_ip}/config"
-    firmware = _send_local_message(
-        device_url, "Appliance.System.Firmware", Firmware, argv.key, "firmware"
-    )
+    if not argv.local_config:
+        device_url = f"http://{argv.device_ip}/config"
+        firmware = _send_local_message(
+            device_url, "Appliance.System.Firmware", Firmware, argv.key, "firmware"
+        )
+        hardware = None
+    else:
+        config = json.load(argv.local_config)
+        firmware = Firmware(**config["firmware"])
+        hardware = Hardware(**config["hardware"])
+        settings.device.uuid = argv.uuid = hardware.uuid
+        settings.device.mac = argv.mac = hardware.macAddress
+
     if not firmware:
         return
 
@@ -116,11 +131,12 @@ def cli(argv):
         logger.warning("Missing user ID - falling back to device userId")
         settings.account.userId = argv.user_id = str(firmware.userId)
 
-    hardware = _send_local_message(
-        device_url, "Appliance.System.Hardware", Hardware, argv.key, "hardware"
-    )
     if not hardware:
-        return
+        hardware = _send_local_message(
+            device_url, "Appliance.System.Hardware", Hardware, argv.key, "hardware"
+        )
+        if not hardware:
+            return
 
     if not argv.uuid:
         logger.warning("Missing UUID - falling back to device UUID")

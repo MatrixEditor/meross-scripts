@@ -177,7 +177,7 @@ def cli(argv: argparse.Namespace) -> None:
         accountCountryCode=argv.country,
         vendor=argv.vendor,
         mobileInfo=MobileInfo(
-            resolution=argv.mobole_resolution,
+            resolution=argv.mobile_resolution,
             mobileOs=argv.mobile_os,
             mobileOsVersion=argv.mobile_os_version,
             uuid=argv.mobile_uuid,

@@ -2,7 +2,7 @@ from pydantic import BaseModel, PositiveInt, Base64Str
 from pydantic_core import Url
 from pydantic_extra_types.mac_address import MacAddress
 
-
+# --- LOCAL MODELS ---
 class Firmware(BaseModel):
     version: str
     compileTime: str
@@ -45,7 +45,7 @@ class WifiList(BaseModel):
 
 class Time(BaseModel):
     timestamp: int
-    timezone: str = ""
+    timezone: str = "UTC"
     timeRule: list = []
 
 
@@ -145,3 +145,20 @@ class UserInfoResponse(BaseModel):
 class UserInfoRequest(BaseModel):
     timezone: str
     regionCode: str
+
+
+# --- DISCOVERY MODELS ---
+class HIRequest(BaseModel):
+    id: str
+    devName: str = "*"
+
+class HIResponse(BaseModel):
+    devName: str
+    devSoftWare: str
+    devHardWare: str
+    ip: str
+    port: int
+    mac: str
+    uuid: str
+    deviceType: str
+    subType: str

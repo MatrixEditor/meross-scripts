@@ -44,7 +44,7 @@ def send_message(
             headers=headers,
         )
         logger.debug(f"Message IN: {response.text}")
-    except requests.exceptions.ConnectTimeout:
+    except (requests.exceptions.ConnectTimeout, requests.exceptions.ReadTimeout):
         logger.error(
             "Connection timed out: Make sure the device is active and "
             f"accessible at: {url!r}."
