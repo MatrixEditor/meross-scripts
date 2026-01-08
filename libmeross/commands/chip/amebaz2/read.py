@@ -4,7 +4,7 @@ import sys
 from rich.console import Console
 from rich.progress import Progress
 
-from libmeross.commands.chip.util import (
+from libmeross.commands.chip.amebaz2.util import (
     command,
     init_fallback_connection,
     open_serial,

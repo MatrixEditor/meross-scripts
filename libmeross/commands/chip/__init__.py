@@ -1,5 +1,4 @@
-from libmeross.commands.chip import console, read
+from libmeross.commands.chip import amebaz2, mtk
 
-__doc__ = """\
-Commands for working with AmebaZI chips
-"""
+__submodule__ = True
+__doc__ = "Commands for working with various chips used in Meross' products"

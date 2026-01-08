@@ -3,7 +3,7 @@ import argparse
 
 from rich.console import Console
 
-from libmeross.commands.chip.util import (
+from libmeross.commands.chip.amebaz2.util import (
     command,
     init_fallback_connection,
     open_serial,
